@@ -29,16 +29,11 @@ class Welcome extends CI_Controller {
 		// ));
 	}
 
+    /**
+     * 记录连接Fiddler 安卓手机上 快手app 首页多个标签刷新出的记录到数据口中
+     */
 	public function myfollows()
 	{
-		// $data = '';
-		// if (!empty($GLOBALS['HTTP_RAW_POST_DATA']))
-		// {
-		//     $data =  isset($GLOBALS['HTTP_RAW_POST_DATA']) ? $GLOBALS['HTTP_RAW_POST_DATA'] : file_get_contents("php://input");
-		//     //$j =json_decode( $command,true);//true,转化成数组
-		// }
-
-		
 
 		$data = file_get_contents("php://input");
 		if($data != null){
@@ -118,6 +113,11 @@ class Welcome extends CI_Controller {
 		}
 	}
 
+    /**
+     * 判断是否 浏览的快手视频/图片记录已经记录在数据库中
+     * @param $photo_id
+     * @return bool
+     */
 	private function check_photo_id_exist($photo_id){
 		$sql = "SELECT COUNT(*) as `counts` FROM download_video where photo_id = ?";
 		$query = $this->db->query($sql,array($photo_id));
@@ -127,6 +127,7 @@ class Welcome extends CI_Controller {
 
 	/**
 	* 下载个人资料的所有图片和视频
+     * (快手App操作是: 进入需要下载用户的页面，下滑刷新出用户的所有作品，然后再点右上角的分享按钮，点击 复制连接，就会开始下载了)
 	*/
 	public function profileshare(){
 		$user_id =  $this->uri->segment(3, 0);
@@ -142,6 +143,9 @@ class Welcome extends CI_Controller {
 		}
 	}
 
+    /**
+     * 下载单个视频的分享(操作是:单个视频/图片上点击分享，然后再点 复制连接，就会开始下载了)
+     */
 	public function sshare(){
 		$photo_id =  intval($this->uri->segment(3, 0));
 		log_message('info','singleshare photo_id:'.$photo_id);
@@ -189,16 +193,20 @@ class Welcome extends CI_Controller {
 
 	}
 
+    /**
+     * @deprecated 测试下载文件
+     */
 	public function test()
 	{
 		$save_path = '5212072166416693142_6';
 		$url = 'https://js2.a.yximgs.com/ufile/atlas/NTk3MjQwMjE2XzIzMjMwMTQ1NDE5XzE1ODEyNjI5NzgxODQ=_0.webp';
 		$this->download_file($save_path,$url);
-
-
-		
 	}
 
+    /**
+     * @deprecated 测试 ftp 上传文件到手机上
+     * @error Unable to connect to your FTP server using the supplied hostname.
+     */
 	public function test2(){
 		$this->load->library('ftp');
 
@@ -219,7 +227,12 @@ class Welcome extends CI_Controller {
 		$this->ftp->close();
 	}
 
-
+    /**
+     * 将下载到的文件 通过ftp的方式上传到手机的 Download/ksvideo 路径下
+     * @deprecated
+     * @param $local_file
+     * @return bool
+     */
 	public function ftp_upload_file($local_file){
 		return true;
 		$this->load->library('ftp');
@@ -238,7 +251,12 @@ class Welcome extends CI_Controller {
 		$this->ftp->close();
 	}
 
-
+    /**
+     * 通过 url 下载文件到本地
+     * @param $save_path
+     * @param $url
+     * @return string
+     */
 	public function download_file($save_path,$url){
 		$url=strtok($url,'?');
 		// Inintialize directory name where 
@@ -292,11 +310,19 @@ class Welcome extends CI_Controller {
 		return $save_file_loc;
 	}
 
+    /**
+     * 判断文件是否已下载
+     * @deprecated 判断本地是否存在对应的文件即可
+     * @param $photo_id
+     */
 	public function video_is_download($photo_id){
 		$sql = "UPDATE download_video set is_download=1 where photo_id = ?";
 		$this->db->query($sql,array($photo_id));
 	}
 
+    /**
+     * @deprecated 测试
+     */
 	public function test3(){
 		$url = 'https://js2.a.yximgs.com/ufile/atlas/NTk3MjQwMjE2XzIzMjMwMTQ1NDE5XzE1ODEyNjI5NzgxODQ=_0.webp?test=1';
 
